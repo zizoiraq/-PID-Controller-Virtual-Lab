@@ -80,17 +80,18 @@ with right:
 
     col1, col2, col3 = st.columns(3)
 
-    with col1:
-        st.metric("Final Outlet Temp (°C)", f"{final_T:.2f}")
-        st.latex(r"T_{\text{out,next}} = T_{\text{out}} + \frac{UA \cdot (T_{\text{in}} - T_{\text{out}}) \cdot \Delta t}{\dot{m} \cdot C_p \cdot 1000}")
+with col1:
+    st.metric("Final Outlet Temp (°C)", f"{final_T:.2f}")
+    st.latex(r"T_{\text{out,next}} = T_{\text{out}} + \frac{UA \cdot (T_{\text{in}} - T_{\text{out}}) \cdot \Delta t}{\dot{m} \cdot C_p \cdot 1000}")
 
-    with col2:
-        st.metric("Heat Transferred (Q)", f"{Q:.2f} kJ/s")
-        st.latex(r"Q = UA \cdot (T_{\text{out}} - T_{\text{cool}})")
+with col2:
+    st.metric("Heat Transferred (Q)", f"{Q:.2f} kJ/s")
+    st.latex(r"Q = UA \cdot (T_{\text{out}} - T_{\text{cool}})")
 
-    with col3:
-        st.metric("Temperature Drop (ΔT)", f"{delta_T:.2f} °C")
-        st.latex(r"\Delta T = T_{\text{in}} - T_{\text{out}}")
+with col3:
+    st.metric("Temperature Drop (ΔT)", f"{delta_T:.2f} °C")
+    st.latex(r"\Delta T = T_{\text{in}} - T_{\text{out}}")
+
 
     # Plot
     fig, ax = plt.subplots()
