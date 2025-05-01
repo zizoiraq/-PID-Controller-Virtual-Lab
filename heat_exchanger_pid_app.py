@@ -53,6 +53,17 @@ with left:
         - ⚫ **Coolant outlet**  
         - 🧮 **UA, Cp, ṁ:** System parameters  
         """)
+with col1:
+    st.metric("Final Outlet Temp (°C)", f"{final_T:.2f}")
+    st.latex(r"T_{\text{out,next}} = ...")
+
+with col2:
+    st.metric("Heat Transferred (Q)", f"{Q:.2f} kJ/s")
+    st.latex(r"Q = ...")
+
+with col3:
+    st.metric("Temperature Drop (ΔT)", f"{delta_T:.2f} °C")
+    st.latex(r"\Delta T = ...")
 
 # Simulation
 dt = 1
