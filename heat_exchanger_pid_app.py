@@ -37,6 +37,21 @@ with st.sidebar.expander("ℹ️ Parameter Help"):
     - **ṁ**: Mass flow rate of the fluid  
     - **T_set**: Desired outlet temperature  
     """)
+st.subheader("📊 Real-Time Results with Formulas")
+
+col1, col2, col3 = st.columns(3)
+
+with col1:
+    st.metric("Final Outlet Temp (°C)", f"{final_T:.2f}")
+    st.caption("**T_out_next = T_out + (UA × (T_in - T_out) × dt) / (m · Cp × 1000)**")
+
+with col2:
+    st.metric("Heat Transferred (Q)", f"{Q:.2f} kJ/s")
+    st.caption("**Q = UA × (T_out - T_cool)**")
+
+with col3:
+    st.metric("Temperature Drop (ΔT)", f"{delta_T:.2f} °C")
+    st.caption("**ΔT = T_in - T_out**")
 
 # --- Main Layout ---
 left, right = st.columns([1, 2])
