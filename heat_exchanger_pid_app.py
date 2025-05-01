@@ -117,29 +117,18 @@ st.success("✅ Lab ready for student use!")
 
 
 
-# --- Formulas Section ---
-with st.expander("📘 Formulas Used in This Simulation"):
-    st.markdown("""
-    ### 🔥 Heat Transfer:
-    **Q = UA · (T_in - T_out)**  
-    - Q: Heat transferred [kJ/s]  
-    - UA: Overall heat transfer coefficient × area [W/°C]  
-    - T_in, T_out: Inlet and outlet temperatures of the hot fluid
+st.subheader("📊 Real-Time Results with Formulas")
 
-    ### 🌡 Outlet Temperature Change:
-    **T_out_next = T_out + (Q × dt) / (ṁ · Cp · 1000)**  
-    - T_out_next: New outlet temp  
-    - dt: Time step [s]  
-    - ṁ: Mass flow rate [kg/s]  
-    - Cp: Specific heat capacity [kJ/kg·°C]
+col1, col2, col3 = st.columns(3)
 
-    ### 🎛 PID Controller:
-    **U = Kp·e + Ki·∫e·dt + Kd·de/dt**  
-    - e = T_set - T_out  
-    - Kp, Ki, Kd: PID gains  
-    - U: Control signal → used to adjust UA
+with col1:
+    st.metric("Final Outlet Temp (°C)", f"{final_T:.2f}")
+    st.caption("**T_out_next = T_out + (UA × (T_in - T_out) × dt) / (m · Cp × 1000)**")
 
-    ### 💡 Notes:
-    - The simulation assumes UA changes dynamically based on the control signal.
-    - The temperature response is calculated iteratively at each time step.
-    """)
+with col2:
+    st.metric("Heat Transferred (Q)", f"{Q:.2f} kJ/s")
+    st.caption("**Q = UA × (T_out - T_cool)**")
+
+with col3:
+    st.metric("Temperature Drop (ΔT)", f"{delta_T:.2f} °C")
+    st.caption("**ΔT = T_in - T_out**")
