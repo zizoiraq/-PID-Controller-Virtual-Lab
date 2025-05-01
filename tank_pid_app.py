@@ -1,82 +1,117 @@
 import streamlit as st
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
 
-# Page config
-st.set_page_config(layout="wide", page_title="Tank Level PID Lab")
+# PID-controlled tank simulation function
+def simulate_tank(Kp, Ki, Kd, setpoint=5.0, sim_time=100, dt=1.0, A=1.0, max_inflow=5.0):
+    time = []
+    level = []
+    h = 0  # initial level
+    integral = 0
+    prev_error = setpoint - h
 
-# Title
-st.title("🧪 Virtual PID-Controlled Tank Level Lab")
-st.markdown("Designed by: *Azam Isam*")
+    for t in range(0, int(sim_time)):
+        error = setpoint - h
+        integral += error * dt
+        derivative = (error - prev_error) / dt
 
-# Sidebar settings
-with st.sidebar:
-    st.header("🛠 System Settings")
-    setpoint = st.slider("Setpoint Level (m)", 1.0, 10.0, 2.0, 0.1)
-    area = st.slider("Tank Area (m²)", 0.5, 5.0, 2.0, 0.1)
-    max_flow = st.slider("Max Inflow Rate (m³/s)", 1.0, 10.0, 2.5, 0.1)
+        inflow = Kp * error + Ki * integral + Kd * derivative
+        inflow = max(0, min(max_inflow, inflow))
 
-    st.header("🎛 PID Tuning")
-    Kp = st.slider("Kp", 0.0, 10.0, 1.0, 0.1)
-    Ki = st.slider("Ki", 0.0, 5.0, 0.0, 0.1)
-    Kd = st.slider("Kd", 0.0, 2.0, 0.0, 0.1)
+        outflow = 0.5 * h  # simple linear outflow
+        dh = (inflow - outflow) / A
+        h += dh * dt
+        h = max(0, h)
 
-# Simulation parameters
-dt = 0.1
-t = np.arange(0, 100, dt)
-h = np.zeros_like(t)
-Q_in = np.zeros_like(t)
-Q_out = 1.0
+        prev_error = error
+        time.append(t)
+        level.append(h)
 
-integral = 0
-prev_error = 0
+    return np.array(time), np.array(level)
 
-for i in range(1, len(t)):
-    error = setpoint - h[i-1]
-    integral += error * dt
-    derivative = (error - prev_error) / dt
-    u = Kp * error + Ki * integral + Kd * derivative
-    prev_error = error
+# --- Streamlit App ---
+st.set_page_config(page_title="Tank PID Lab", layout="wide")
+st.title("🚰 Virtual PID-Controlled Tank Level Lab")
 
-    Q_in[i] = max(0, min(max_flow, u))
-    dh = (Q_in[i] - Q_out) * dt / area
-    h[i] = h[i-1] + dh
-    h[i] = max(0, h[i])  # prevent negative level
+st.markdown("""
+**Northern Technical University**  
+Technical Engineering College  
+Chemical and Petroleum Industries Technologies Engineering  
+_Designed by: Azam Isam_
+""")
+st.markdown("---")
 
-# Layout
+# Sidebar Controls
+st.sidebar.header("🔧 System Settings")
+setpoint = st.sidebar.slider("Setpoint Level (m)", 1.0, 10.0, 5.0, 0.5)
+A = st.sidebar.slider("Tank Area (m²)", 0.5, 5.0, 1.0, 0.1)
+max_inflow = st.sidebar.slider("Max Inflow Rate (m³/s)", 1.0, 10.0, 5.0, 0.5)
+
+st.sidebar.header("🎛 PID Tuning")
+Kp = st.sidebar.slider("Kp", 0.0, 10.0, 2.0)
+Ki = st.sidebar.slider("Ki", 0.0, 5.0, 0.5)
+Kd = st.sidebar.slider("Kd", 0.0, 2.0, 0.1)
+
+# Simulate system
+t, h = simulate_tank(Kp, Ki, Kd, setpoint, A=A, max_inflow=max_inflow)
+
+# Main layout
 col1, col2 = st.columns([1, 2])
 
 with col1:
     st.subheader("📦 Tank Visualization")
-
-    fig, ax = plt.subplots(figsize=(2.5, 5))
-    tank_max = 10
-    tank_width = 1.0
-
-    ax.barh(y=0.5, width=tank_width, height=h[-1], left=0, color='deepskyblue', edgecolor='black')
-    ax.set_ylim(0, tank_max)
-    ax.set_xlim(0, tank_width)
-    ax.set_yticks(np.arange(0, tank_max+1, 1))
-    ax.set_xticks([])
-    ax.set_title("Tank Level", fontsize=10)
-    ax.tick_params(axis='y', labelsize=8)
-    ax.spines['top'].set_visible(False)
-    ax.spines['right'].set_visible(False)
-    ax.spines['bottom'].set_visible(False)
-
-    for lvl in np.arange(0, tank_max + 1, 2):
-        ax.text(tank_width / 2, lvl + 0.1, f"{lvl:.0f} m", ha='center', va='bottom', fontsize=7, color='black')
-
-    st.pyplot(fig)
+    tank_height = 300
+    water_height = int((h[-1] / 10) * tank_height)
+    tank_html = f"""
+    <div style='
+        width: 120px;
+        height: {tank_height}px;
+        border: 4px solid #333;
+        background-color: lightgray;
+        position: relative;
+    '>
+        <div style='
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: {water_height}px;
+            background-color: deepskyblue;
+        '></div>
+    </div>
+    """
+    st.markdown(tank_html, unsafe_allow_html=True)
     st.metric("Final Level", f"{h[-1]:.2f} m")
 
 with col2:
     st.subheader("📈 Tank Level Over Time")
-    fig2, ax2 = plt.subplots(figsize=(8, 4))
-    ax2.plot(t, h, label="Level", color='blue')
-    ax2.axhline(setpoint, color='green', linestyle='--', label='Setpoint')
-    ax2.set_xlabel("Time (s)")
-    ax2.set_ylabel("Level (m)")
-    ax2.set_title("Tank Level vs. Time")
-    ax2.legend()
-    st.pyplot(fig2)
+    fig, ax = plt.subplots(figsize=(8, 4))
+    ax.plot(t, h, label="Level", color="blue", linewidth=2)
+    ax.axhline(setpoint, color="green", linestyle="--", label="Setpoint")
+    ax.set_xlabel("Time (s)")
+    ax.set_ylabel("Level (m)")
+    ax.set_title("Tank Level vs. Time")
+    ax.legend()
+    ax.grid(True)
+    st.pyplot(fig)
+
+# Educational Section
+with st.expander("📘 Equations Used"):
+    st.latex(r"h_{t+1} = h_t + \frac{(Q_{in} - Q_{out}) \cdot \Delta t}{A}")
+    st.latex(r"Q_{in} = K_p \cdot e + K_i \cdot \int e \, dt + K_d \cdot \frac{de}{dt}")
+    st.latex(r"Q_{out} = 0.5 \cdot h_t")
+    st.markdown("""
+    - \( A \): Tank cross-sectional area  
+    - \( Q_{in} \): Inflow controlled by PID  
+    - \( Q_{out} \): Outflow is proportional to level  
+    """)
+
+with st.expander("🎓 Student Exercise"):
+    st.markdown("""
+    **Scenario:**  
+    Keep the tank level steady at 6.0 m using PID control.  
+    - Tank area: 2.0 m²  
+    - Inflow limited to 6 m³/s  
+    - Tune Kp, Ki, Kd to prevent overshoot and oscillation.
+
+    ✅ Report your PID settings and final level.
+    """)
