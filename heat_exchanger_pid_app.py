@@ -114,3 +114,32 @@ with st.expander("✅ Checklist"):
     st.checkbox("Student explains reasoning in report")
 
 st.success("✅ Lab ready for student use!")
+
+
+
+# --- Formulas Section ---
+with st.expander("📘 Formulas Used in This Simulation"):
+    st.markdown("""
+    ### 🔥 Heat Transfer:
+    **Q = UA · (T_in - T_out)**  
+    - Q: Heat transferred [kJ/s]  
+    - UA: Overall heat transfer coefficient × area [W/°C]  
+    - T_in, T_out: Inlet and outlet temperatures of the hot fluid
+
+    ### 🌡 Outlet Temperature Change:
+    **T_out_next = T_out + (Q × dt) / (ṁ · Cp · 1000)**  
+    - T_out_next: New outlet temp  
+    - dt: Time step [s]  
+    - ṁ: Mass flow rate [kg/s]  
+    - Cp: Specific heat capacity [kJ/kg·°C]
+
+    ### 🎛 PID Controller:
+    **U = Kp·e + Ki·∫e·dt + Kd·de/dt**  
+    - e = T_set - T_out  
+    - Kp, Ki, Kd: PID gains  
+    - U: Control signal → used to adjust UA
+
+    ### 💡 Notes:
+    - The simulation assumes UA changes dynamically based on the control signal.
+    - The temperature response is calculated iteratively at each time step.
+    """)
