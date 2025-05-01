@@ -71,7 +71,8 @@ col1, col2 = st.columns([1, 1.5])
 with col1:
     st.subheader("🧪 Oven Visualization")
     image = Image.open("oven_diagram.png")
-    st.image(image, use_column_width=True)
+    st.image(image, use_container_width=True)
+
 
     if "T_final" in st.session_state:
         temp = st.session_state["T_final"]
