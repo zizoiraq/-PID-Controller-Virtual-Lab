@@ -80,19 +80,17 @@ with right:
 
     col1, col2, col3 = st.columns(3)
 with col1:
-    st.markdown("**Final Outlet Temp (°C)**")
-    st.latex(r"T_{\text{out,next}} = T_{\text{out}} + \frac{UA \cdot (T_{\text{in}} - T_{\text{out}}) \cdot \Delta t}{\dot{m} \cdot C_p \cdot 1000}")
-    st.metric(label="", value=f"{final_T:.2f}")
+    st.metric("Final Outlet Temp (°C)", f"{final_T:.2f}")
+    st.latex(r"T_{\text{out,next}} = ...")
 
 with col2:
-    st.markdown("**Heat Transferred (Q)**")
-    st.latex(r"Q = UA \cdot (T_{\text{out}} - T_{\text{cool}})")
-    st.metric(label="", value=f"{Q:.2f} kJ/s")
+    st.metric("Heat Transferred (Q)", f"{Q:.2f} kJ/s")
+    st.latex(r"Q = ...")
 
 with col3:
-    st.markdown("**Temperature Drop (ΔT)**")
-    st.latex(r"\Delta T = T_{\text{in}} - T_{\text{out}}")
-    st.metric(label="", value=f"{delta_T:.2f} °C")
+    st.metric("Temperature Drop (ΔT)", f"{delta_T:.2f} °C")
+    st.latex(r"\Delta T = ...")
+
 
 
 
